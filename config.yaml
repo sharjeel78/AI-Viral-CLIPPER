@@ -1,0 +1,91 @@
+# ============================================================
+#  Viral Clipper - settings
+#  Edit this file to change how the tool behaves.
+#  Most of these can also be changed from the web UI.
+# ============================================================
+
+paths:
+  downloads: downloads      # source videos are saved here
+  outputs: outputs          # finished clips are saved here
+  cache: .cache             # transcripts + models (safe to delete)
+
+download:
+  max_height: 1080          # 720 / 1080 / 1440 / 2160
+
+transcription:
+  model: small              # tiny, base, small, medium, large-v3 (bigger = better + slower)
+  device: auto              # auto, cuda, cpu
+  language: null            # null = auto-detect, or "en", "ur", "hi" ...
+
+llm:
+  # ollama  = free, runs on your PC (install from ollama.com, then: ollama pull qwen2.5:7b)
+  # openai  = any OpenAI-compatible API (OpenAI, Groq, OpenRouter, Gemini's OpenAI endpoint ...)
+  # anthropic = Claude API
+  # none    = no AI, uses a simple built-in scoring heuristic
+  provider: ollama
+  ollama:
+    url: http://localhost:11434
+    model: qwen2.5:7b
+    context: 8192
+  openai:
+    base_url: https://api.openai.com/v1
+    api_key: ""             # or set env var LLM_API_KEY
+    model: gpt-4o-mini
+  anthropic:
+    api_key: ""             # or set env var ANTHROPIC_API_KEY
+    model: claude-haiku-4-5-20251001
+  chunk_minutes: 10         # transcript is sent to the AI in chunks of this length
+  max_output_tokens: 1200   # stops a slow local AI from writing forever
+
+clips:
+  count: 5                  # how many clips to export
+  min_seconds: 20
+  max_seconds: 75
+  min_score: 0              # skip clips the AI scored below this (0-100)
+
+reframe:
+  layout: auto              # auto, track, split, fit, face_screen
+  zoom: auto                # auto, wide (full body), medium (chest), close (face)
+  analysis_fps: 8           # frames per second analysed for faces/motion
+  full_scan_every: 8        # every Nth analysed frame is a full scan; the rest are quick
+  analysis_width: 640       # frames are downscaled to this width for analysis
+  dead_zone: 0.12           # camera ignores movement inside this fraction of the crop width
+  max_pan_speed: 0.35       # max camera speed, in crop-widths per second
+  smoothing_seconds: 0.6    # extra smoothing of the camera path
+  speaker_hold_seconds: 1.2 # minimum time before switching to another speaker
+  split_switch_rate: 0.35   # auto: speaker switches per second that trigger split-screen
+  min_coverage: 0.85        # clips below this face coverage are marked "needs review"
+
+captions:
+  enabled: true
+  style: clean              # clean, bold_box, neon, gold, minimal, karaoke
+  language: auto            # auto (as spoken), en, ur (Urdu script), roman (Roman Urdu)
+  position: lower           # lower, middle, upper
+  # leave these empty to use the style's own look; set them to override it
+  font: null
+  urdu_font: Noto Nastaliq Urdu
+  font_size: null
+  color: null
+  highlight_color: null
+  outline_color: null
+  words_per_line: null
+  uppercase: null
+
+post_caption:
+  language: auto            # auto (English video -> English, Urdu video -> Roman Urdu), en, roman, ur
+
+trim:
+  start: 0                  # seconds; the app's video cutter sets these
+  end: 0                    # 0 means "until the end"
+
+hook_title:
+  enabled: true             # shows the AI-generated title at the top of the clip
+  seconds: 3.0
+  font_size: 64
+
+output:
+  width: 1080
+  height: 1920
+  crf: 20                   # quality: lower = better + bigger files (18-23 is good)
+  preset: veryfast          # CPU encoder speed: ultrafast, veryfast, fast, medium (slower = slightly smaller files)
+  encoder: auto             # auto = graphics card (NVIDIA/Intel/AMD) if possible, else CPU. Or: nvenc, qsv, amf, cpu
